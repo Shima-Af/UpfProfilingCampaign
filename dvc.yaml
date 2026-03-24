@@ -1,0 +1,66 @@
+# dvc.yaml — Pipeline definition.
+# Each stage declares its command, dependencies, parameters, and outputs.
+# DVC builds a DAG from this and only re-runs stages whose inputs changed.
+
+stages:
+  ingest:
+    cmd: python src/ingest.py
+    deps:
+      - src/ingest.py
+      - configs/file_manifest.json
+      - data/raw/loadcore
+      - data/raw/scaphandre
+    params:
+      - ingest
+    outs:
+      - data/interim/loadcore
+      - data/interim/scaphandre
+      - data/interim/discovery.json
+
+  merge:
+    cmd: python src/merge.py
+    deps:
+      - src/merge.py
+      - data/interim/loadcore
+      - data/interim/scaphandre
+      - data/interim/discovery.json
+    params:
+      - features.time_alignment_tolerance_sec
+    outs:
+      - data/interim/merged.csv:
+          persist: true
+
+  featurize:
+    cmd: python src/features.py
+    deps:
+      - src/features.py
+      - data/interim/merged.csv
+    params:
+      - features
+    outs:
+      - data/processed/features.csv
+
+  train:
+    cmd: python src/train.py
+    deps:
+      - src/train.py
+      - data/processed/features.csv
+    params:
+      - train
+    outs:
+      - models/model.pkl
+    metrics:
+      - reports/metrics.json:
+          cache: false
+
+  evaluate:
+    cmd: python src/evaluate.py
+    deps:
+      - src/evaluate.py
+      - models/model.pkl
+      - data/processed/features.csv
+    params:
+      - evaluate
+    plots:
+      - reports/figures/feature_importance.png:
+          cache: false

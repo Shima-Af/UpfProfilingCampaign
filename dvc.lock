@@ -1,0 +1,45 @@
+schema: '2.0'
+stages:
+  ingest:
+    cmd: python src/ingest.py
+    deps:
+    - path: configs/file_manifest.json
+      hash: md5
+      md5: 583b719c32c31c36eaa775f54e92287f
+      size: 2026
+    - path: data/raw/loadcore
+      hash: md5
+      md5: 69b3ba27335179c1f18dc8055a8e05a9.dir
+      size: 65017095
+      nfiles: 220
+    - path: data/raw/scaphandre
+      hash: md5
+      md5: 3670e0e92928a3f6e9faaf3f5a13f5d3.dir
+      size: 2662696642
+      nfiles: 5
+    - path: src/ingest.py
+      hash: md5
+      md5: 4d24c1f9d2c5c37dec10da396da70607
+      size: 6054
+    params:
+      params.yaml:
+        ingest:
+          manifest_path: configs/file_manifest.json
+          loadcore_zip_dir: data/raw/loadcore
+          scaphandre_csv_dir: data/raw/scaphandre
+          output_dir: data/interim
+    outs:
+    - path: data/interim/discovery.json
+      hash: md5
+      md5: 9dbd39fb000488c639e5794fa93354e6
+      size: 68041
+    - path: data/interim/loadcore
+      hash: md5
+      md5: de6e8d4bde43ae164daf054a7817ba51.dir
+      size: 11148357
+      nfiles: 4180
+    - path: data/interim/scaphandre
+      hash: md5
+      md5: 87b82a44401a7f6a78ea807fdb2a0f17.dir
+      size: 2662696393
+      nfiles: 4
