@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Data (tracked by DVC, not Git)
+/data/raw/
+/data/interim/
+/data/processed/
+/models/
+
+# MLflow
+/mlruns/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db

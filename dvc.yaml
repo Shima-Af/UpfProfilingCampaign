@@ -24,8 +24,9 @@ stages:
       - data/interim/loadcore
       - data/interim/scaphandre
       - data/interim/discovery.json
+      - data/raw/scaphandre
     params:
-      - features.time_alignment_tolerance_sec
+      - merge
     outs:
       - data/interim/merged.csv:
           persist: true

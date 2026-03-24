@@ -43,3 +43,43 @@ stages:
       md5: 87b82a44401a7f6a78ea807fdb2a0f17.dir
       size: 2662696393
       nfiles: 4
+  merge:
+    cmd: python src/merge.py
+    deps:
+    - path: data/interim/discovery.json
+      hash: md5
+      md5: 9dbd39fb000488c639e5794fa93354e6
+      size: 68041
+    - path: data/interim/loadcore
+      hash: md5
+      md5: de6e8d4bde43ae164daf054a7817ba51.dir
+      size: 11148357
+      nfiles: 4180
+    - path: data/interim/scaphandre
+      hash: md5
+      md5: 87b82a44401a7f6a78ea807fdb2a0f17.dir
+      size: 2662696393
+      nfiles: 4
+    - path: data/raw/scaphandre
+      hash: md5
+      md5: 3670e0e92928a3f6e9faaf3f5a13f5d3.dir
+      size: 2662696642
+      nfiles: 5
+    - path: src/merge.py
+      hash: md5
+      md5: ab49fd74f3a4d492182c45436369ef52
+      size: 16877
+    params:
+      params.yaml:
+        merge:
+          time_alignment_tolerance_sec: 3
+          interim_dir: data/interim
+          raw_scaphandre_dir: data/raw/scaphandre
+          scaphandre_mapping:
+            sd_core_dpdk: dpdk
+            oai_userspaceapplication: usr
+    outs:
+    - path: data/interim/merged.csv
+      hash: md5
+      md5: 3d6d4c6ec7b7e3f9e18d2482563aa023
+      size: 6686604

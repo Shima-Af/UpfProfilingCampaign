@@ -1,0 +1,44 @@
+{
+  "description": "Manifest mapping LoadCore zip files to UPF deployments. Each zip contains the same 19 CSV result files from Keysight LoadCore. Zip filenames encode the UPF variant and test date.",
+
+  "files_to_extract": [
+    "Fullcoreapplicationtraffic_GTPuKbitss_DN.csv",
+    "Fullcoreapplicationtraffic_GTPuKbitss_NGRAN.csv",
+    "Fullcoreapplicationtraffic_GTPuPacketss_DN.csv",
+    "Fullcoreapplicationtraffic_GTPuPacketss_NGRAN.csv",
+    "Fullcoreapplicationtraffic_GTPuTraffic_DN.csv",
+    "Fullcoreapplicationtraffic_GTPuTraffic_NGRAN.csv",
+    "Fullcoreapplicationtraffic_OneWayDelayAverage_DN.csv",
+    "Fullcoreapplicationtraffic_OneWayDelayAverage_RAN.csv",
+    "Fullcoreapplicationtraffic_UplinkDataOneWayDelayDistribution.csv",
+    "Fullcoreapplicationtraffic_DownlinkOneWayDelayDistribution.csv",
+    "Fullcoreapplicationtraffic_UserPlaneThroughput.csv",
+    "Fullcoreapplicationtraffic_UserPlaneThroughput_DNRxTraffic.csv",
+    "Fullcoreapplicationtraffic_UserPlaneThroughput_DNTxTraffic.csv",
+    "Fullcoreapplicationtraffic_UserPlaneThroughput_RANRxTraffic.csv",
+    "Fullcoreapplicationtraffic_UserPlaneThroughput_RANTxTraffic.csv",
+    "Fullcoreapplicationtraffic_GTPuPackets_DN.csv",
+    "Fullcoreapplicationtraffic_GTPuPackets_NGRAN.csv",
+    "Fullcoreapplicationtraffic_DelayVariationJitterAverage_DN.csv",
+    "Fullcoreapplicationtraffic_DelayVariationJitterAverage_RAN.csv"
+  ],
+
+  "deployments": [
+    {
+      "zip_file": "REPLACE_WITH_ACTUAL_FILENAME.zip",
+      "deployment_id": "sdcore_dpdk",
+      "upf_variant": "SD-Core",
+      "dataplane": "DPDK",
+      "scaphandre_csv": "REPLACE_WITH_MATCHING_SCAPHANDRE.csv",
+      "notes": "Baremetal SD-Core with DPDK dataplane"
+    },
+    {
+      "zip_file": "REPLACE_WITH_ACTUAL_FILENAME.zip",
+      "deployment_id": "oai_userspace",
+      "upf_variant": "OAI",
+      "dataplane": "UserspaceApplication",
+      "scaphandre_csv": "REPLACE_WITH_MATCHING_SCAPHANDRE.csv",
+      "notes": "Baremetal OAI with userspace application dataplane"
+    }
+  ]
+}

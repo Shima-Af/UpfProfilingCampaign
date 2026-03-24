@@ -1,0 +1,33 @@
+# params.yaml — Single source of truth for all pipeline parameters.
+# Both DVC and your Python scripts read from here.
+# Change a value, run `dvc repro`, and only affected stages re-run.
+
+ingest:
+  manifest_path: configs/file_manifest.json
+  loadcore_zip_dir: data/raw/loadcore
+  scaphandre_csv_dir: data/raw/scaphandre
+  output_dir: data/interim
+
+merge:
+  time_alignment_tolerance_sec: 3
+  interim_dir: data/interim
+  raw_scaphandre_dir: data/raw/scaphandre
+  scaphandre_mapping:
+    sd_core_dpdk: dpdk
+    oai_userspaceapplication: usr
+
+features:
+  rolling_window_sec: 30
+  sec_normalization: per_gbps    # "per_gbps" or "per_packet"
+  features_output: data/processed/features.csv
+
+train:
+  model_type: random_forest
+  test_split: 0.2
+  random_state: 42
+  n_estimators: 200
+  max_depth: 12
+  min_samples_leaf: 5
+
+evaluate:
+  metrics_output: reports/metrics.json
