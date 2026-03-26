@@ -18,7 +18,7 @@ merge:
 
 features:
   rolling_window_sec: 30
-  sec_normalization: per_gbps    # "per_gbps" or "per_packet"
+  target: sec_total               # "sec_total", "sec_net", "power_watts", or "net_power_watts"
   features_output: data/processed/features.csv
 
 train:

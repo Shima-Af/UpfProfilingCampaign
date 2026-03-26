@@ -83,3 +83,25 @@ stages:
       hash: md5
       md5: 3d6d4c6ec7b7e3f9e18d2482563aa023
       size: 6686604
+  featurize:
+    cmd: python src/features.py
+    deps:
+    - path: data/interim/merged.csv
+      hash: md5
+      md5: 3d6d4c6ec7b7e3f9e18d2482563aa023
+      size: 6686604
+    - path: src/features.py
+      hash: md5
+      md5: 7bd9edc0143b47ec52a8b325ea42a3b8
+      size: 14061
+    params:
+      params.yaml:
+        features:
+          rolling_window_sec: 30
+          target: sec_total
+          features_output: data/processed/features.csv
+    outs:
+    - path: data/processed/features.csv
+      hash: md5
+      md5: 04497319167520a102d66985238ad005
+      size: 4578338
