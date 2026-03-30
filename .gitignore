@@ -23,3 +23,9 @@ build/
 # OS
 .DS_Store
 Thumbs.db
+
+#LaTeX build files
+reports/*.aux
+reports/*.log
+reports/*.out
+

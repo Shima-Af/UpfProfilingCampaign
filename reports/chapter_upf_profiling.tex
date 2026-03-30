@@ -1,0 +1,549 @@
+% ============================================================
+% Thesis Chapter: Energy Profiling of 5G User Plane Functions
+% ============================================================
+% Compile with:  pdflatex chapter_upf_profiling.tex  (run twice)
+% ============================================================
+
+\documentclass[12pt, a4paper]{report}
+
+% ── Packages ────────────────────────────────────────────────────────────────
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath, amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{xcolor}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage[hidelinks]{hyperref}
+\usepackage{setspace}
+\onehalfspacing
+
+% ── Convenience macros ──────────────────────────────────────────────────────
+\newcommand{\dpdk}{\textsc{sd-core dpdk}}
+\newcommand{\usr}{\textsc{usr-upf}}
+\newcommand{\upf}{\textsc{upf}}
+\newcommand{\secm}{$\mathrm{SEC}$}
+\newcommand{\sectable}{$\mathrm{SEC}_{\mathrm{total}}$}
+\newcommand{\secnet}{$\mathrm{SEC}_{\mathrm{net}}$}
+\newcommand{\figpath}[1]{figures/#1}
+
+\begin{document}
+% ============================================================
+
+\chapter{Energy Profiling of 5G User Plane Functions}
+\label{chap:upf_profiling}
+
+% ── Section 1: Introduction ─────────────────────────────────────────────────
+\section{Introduction}
+\label{sec:intro}
+
+The User Plane Function (\upf{}) is the component of a 5G core network
+responsible for routing and forwarding GTP-U encapsulated user traffic between
+the Radio Access Network (RAN) and the Data Network (DN).
+Its power consumption is therefore directly coupled to network load, and
+understanding this relationship is a prerequisite for energy-aware network
+management and for meeting increasingly stringent sustainability targets in
+mobile telecommunications.
+
+This chapter presents a systematic empirical study of two open-source \upf{}
+implementations under controlled laboratory conditions.
+The first implementation, \dpdk{}, is based on the SD-Core project and
+leverages the Data Plane Development Kit (DPDK) poll-mode I/O driver.
+The second, \usr{}, is the user-plane component of OpenAirInterface and
+uses a conventional interrupt-driven Linux I/O model.
+Traffic was generated with a Keysight LoadCore emulator, and power was
+measured at the host level using the Scaphandre process-level power monitor
+with 1\,s sampling resolution.
+
+The remainder of this chapter is organised as follows.
+Section~\ref{sec:methodology} describes the measurement methodology and
+dataset.
+Section~\ref{sec:profiles} characterises each variant across performance
+and energy dimensions.
+Section~\ref{sec:saturation} investigates the saturation behaviour of
+\usr{} in depth.
+Section~\ref{sec:sec} analyses the Specific Energy Consumption metric and
+its interpretation for poll-mode versus interrupt-driven drivers.
+Section~\ref{sec:correlation} reports feature correlations relevant to
+predictive energy modelling.
+Section~\ref{sec:implications} discusses implications for network operation
+and modelling.
+
+% ── Section 2: Methodology ──────────────────────────────────────────────────
+\section{Measurement Methodology}
+\label{sec:methodology}
+
+\subsection{Testbed Configuration}
+
+Both \upf{} variants were deployed on identical server hardware.
+LoadCore injected downlink UDP flows with a fixed packet size of
+1250\,B at progressively increasing offered loads.
+Each load step was sustained for a fixed duration to allow steady-state
+measurements; the raw time-series data were then merged with per-second power
+readings from Scaphandre.
+
+\subsection{Dataset}
+
+After preprocessing, the merged dataset comprises 9556 one-second
+measurement samples across 110 USR runs and an equivalent number of
+DPDK runs.
+Following feature engineering (removal of zero-variance and near-duplicate
+columns, unit conversions, target computation), the analysis dataset contains
+8781 samples and 44 columns, split evenly between the two variants
+(4388 DPDK, 4393 USR).
+
+\subsection{Metrics}
+
+The following primary metrics are reported throughout this chapter:
+
+\begin{description}
+  \item[Power~(W)] Total host power consumption in watts, as reported by
+    Scaphandre (\texttt{power\_watts}).
+  \item[Net power~(W)] Incremental power above the idle baseline:
+    $P_{\mathrm{net}} = P_{\mathrm{total}} - P_{\mathrm{idle}}$.
+  \item[\sectable{}] Specific Energy Consumption based on total power:
+    $\mathrm{SEC}_{\mathrm{total}} = P_{\mathrm{total}} / \lambda$,
+    where $\lambda$ is throughput in Gbps.
+  \item[\secnet{}] Marginal energy cost: $\mathrm{SEC}_{\mathrm{net}}
+    = P_{\mathrm{net}} / \lambda$.
+  \item[Packet loss] Count of GTP-U packets lost per one-second interval
+    at the DN-side receiver.
+  \item[Downlink delay] Weighted mean one-way packet delay on the
+    downlink path ($\mu$s).
+\end{description}
+
+% ── Section 3: Variant Profiles ─────────────────────────────────────────────
+\section{Variant Profiles}
+\label{sec:profiles}
+
+\subsection{Overview}
+
+Table~\ref{tab:profiles} summarises the key performance and energy
+characteristics of both variants across all measurement conditions.
+Figure~\ref{fig:power_vs_throughput} illustrates the fundamental
+difference in the power--throughput relationship.
+
+\begin{table}[htbp]
+  \centering
+  \caption{UPF variant profiles: key performance and energy metrics.}
+  \label{tab:profiles}
+  \setlength{\tabcolsep}{7pt}
+  \begin{tabular}{lrr}
+    \toprule
+    \textbf{Metric} & \textbf{SD-Core DPDK} & \textbf{USR-UPF} \\
+    \midrule
+    \multicolumn{3}{l}{\textit{Power}} \\
+    \quad Total power range (W)         & $0.807$--$0.859$ & $0.000$--$4.497$ \\
+    \quad Mean power (W)                & $0.821$           & $1.435$           \\
+    \quad Standard deviation (W)        & $0.005$           & $1.527$           \\
+    \quad Dynamic range (W)             & $0.052$           & $4.497$           \\
+    \quad Net power mean (W)            & $0.001$           & $1.419$           \\
+    \midrule
+    \multicolumn{3}{l}{\textit{CPU}} \\
+    \quad Mean CPU (\%)                 & $1.064$           & $1.549$           \\
+    \quad Max CPU (\%)                  & $1.079$           & $4.554$           \\
+    \quad Idle CPU (\%)                 & $1.064$           & $0.018$           \\
+    \midrule
+    \multicolumn{3}{l}{\textit{Throughput}} \\
+    \quad Maximum (Gbps)                & $5.06$            & $2.33$            \\
+    \quad Mean (Gbps)                   & $0.788$           & $0.528$           \\
+    \midrule
+    \multicolumn{3}{l}{\textit{Reliability}} \\
+    \quad Packet loss (sample rows, \%) & $0.0$             & $32.7$            \\
+    \midrule
+    \multicolumn{3}{l}{\textit{Latency}} \\
+    \quad DL delay mean ($\mu$s)  & $311$      & $5031$            \\
+    \quad DL delay max ($\mu$s)   & $24978$    & $25000$           \\
+    \quad RAN jitter mean ($\mu$s) & $1.3$     & $1428$            \\
+    \midrule
+    \multicolumn{3}{l}{\textit{Energy efficiency at $>$1\,Gbps}} \\
+    \quad \sectable{} median (J/Gb)     & $0.27$            & $1.61$            \\
+    \quad \secnet{} median (J/Gb)       & $0.002$           & $1.61$            \\
+    \midrule
+    L2/L3 overhead ratio (mean)         & $2.11$            & $1.86$            \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{\figpath{fig1_power_vs_throughput}}
+  \caption{Power consumption versus throughput for each UPF variant.
+    SD-Core DPDK (left) exhibits a near-constant power profile due to
+    continuous CPU polling. USR-UPF (right) shows a strong load-proportional
+    relationship but saturates above 0.5\,Gbps.}
+  \label{fig:power_vs_throughput}
+\end{figure}
+
+\subsection{SD-Core DPDK}
+
+The DPDK data-plane driver operates in poll mode: a dedicated CPU thread
+continuously spins on the receive queue, eliminating interrupt overhead at
+the cost of occupying the core regardless of traffic.
+This architectural choice manifests clearly in the measurements.
+
+Power consumption remains almost constant at $0.821 \pm 0.005$\,W across
+the entire load range (0--5.06\,Gbps), yielding a dynamic range of only
+52\,mW.
+CPU utilisation is similarly invariant at $1.064 \pm 0.004$\,\%, and the
+Pearson correlation between throughput and CPU is $r = 0.016$, confirming
+that the polling loop consumes a fixed share of the core irrespective of
+packet rate.
+
+Despite its flat power profile, \dpdk{} achieves the highest throughput
+of both variants (5.06\,Gbps) with zero packet loss
+across all 4388 measurement samples.
+Downlink delay is low (mean 311\,$\mu$s) and RAN jitter
+is negligible (mean 1.3\,$\mu$s), making it the preferable
+choice for latency-sensitive traffic.
+
+\subsection{USR-UPF}
+
+\usr{} uses the standard Linux socket and eBPF/XDP interrupt path.
+Power scales strongly with offered load: $r(\text{throughput, power}) =
+0.81$ (compared with $0.46$ for DPDK), and the system transitions from
+near-zero power (0.034\,W) at idle to a plateau of approximately
+3.4\,W once saturated.
+CPU utilisation follows the same trend ($r = 0.76$), rising from 0\,\%
+at idle to 4.6\,\% at peak.
+
+However, \usr{} saturates at approximately 0.5\,Gbps
+(see Section~\ref{sec:saturation}), beyond which virtually all packets are
+dropped.
+Delay is consistently higher than DPDK (mean 5\,ms) and
+RAN jitter degrades catastrophically above saturation (mean
+1428\,$\mu$s, maximum 199\,ms).
+
+Figure~\ref{fig:variant_profiles} illustrates the load-stratified
+comparison of both variants across the four key metrics.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{\figpath{fig2_variant_profiles}}
+  \caption{Load-stratified variant profiles. Throughput bins on the
+    x-axis (Gbps). (a)~Power consumption; (b)~CPU utilisation;
+    (c)~packet loss incidence; (d)~mean downlink delay.
+    Error bars in (a) denote $\pm 1$ standard deviation.
+    DPDK maintains flat power and zero loss at all loads; USR scales
+    with load but saturates above 0.5\,Gbps.}
+  \label{fig:variant_profiles}
+\end{figure}
+
+% ── Section 4: USR Saturation ────────────────────────────────────────────────
+\section{USR-UPF Saturation Analysis}
+\label{sec:saturation}
+
+\subsection{Saturation Onset}
+
+To characterise the saturation regime with fine granularity, measurements
+were binned into 50\,Mbps throughput intervals.
+Figure~\ref{fig:oai_saturation} shows the transition across four dimensions:
+loss incidence, loss magnitude, delay, and the power/CPU trajectory.
+
+The first bin where more than 5\,\% of samples exhibit packet loss occurs at
+$\approx$\,0.17\,Gbps, indicating the onset of
+saturation.
+Loss increases steeply, reaching 50\,\% at $\approx$\,0.57\,Gbps,
+beyond which essentially all samples report loss.
+From this point, \usr{} enters a fully saturated regime: throughput
+measurements reflect the offered load injected by LoadCore, not the
+effective forwarding rate, and delay jumps to the measurement ceiling
+of 25\,ms.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{\figpath{fig3_oai_saturation}}
+  \caption{USR-UPF saturation transition in 50\,Mbps
+    throughput bins. The dashed vertical line marks the saturation onset at
+    $\approx$\,0.17\,Gbps.
+    (a)~Fraction of samples with packet loss;
+    (b)~mean number of packets lost per interval (when loss occurs);
+    (c)~mean downlink delay;
+    (d)~mean power and CPU utilisation (dual axis).}
+  \label{fig:oai_saturation}
+\end{figure}
+
+\subsection{Power Behaviour at Saturation}
+
+Despite losing packets, \usr{} continues to consume power proportionally
+to the offered load up to $\approx$\,0.5\,Gbps, after
+which power plateaus at approximately 3.4\,W
+(Figure~\ref{fig:oai_saturation}d).
+This indicates that the CPU is fully committed to packet processing at
+saturation; additional offered load does not increase power but increases
+loss instead.
+
+The behaviour is summarised as follows:
+\begin{itemize}
+  \item Pre-saturation ($<$\,0.3\,Gbps):
+    mean power $= 0.338$\,W, zero loss.
+  \item Transition (0.3--0.57\,Gbps): power rises sharply, loss begins.
+  \item Post-saturation ($>$\,0.5\,Gbps):
+    mean power $\approx 3.4$\,W, near-total loss.
+\end{itemize}
+
+\subsection{Per-Run Characterisation}
+
+Figure~\ref{fig:oai_per_run} aggregates the loss and power behaviour at the
+granularity of individual measurement runs.
+Of the 110 USR runs, 61 (55\,\%) completed without any packet
+loss; these runs had a maximum offered throughput of at most
+0.1\,Gbps.
+Every run exceeding 0.06\,Gbps maximum offered load
+incurred at least some packet loss, establishing the \emph{practical safe
+operating boundary} of \usr{} at approximately 100\,Mbps.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{\figpath{fig7_oai_per_run_saturation}}
+  \caption{USR-UPF per-run saturation summary.
+    Each point represents one measurement run.
+    (a)~Overall packet loss versus maximum offered throughput, coloured
+    by mean power; (b)~mean power versus maximum offered throughput,
+    coloured by packet loss fraction.}
+  \label{fig:oai_per_run}
+\end{figure}
+
+% ── Section 5: SEC Analysis ──────────────────────────────────────────────────
+\section{Specific Energy Consumption Analysis}
+\label{sec:sec}
+
+\subsection{Definitions}
+
+Specific Energy Consumption (\secm{}) is defined as the ratio of power
+consumed to useful throughput delivered.
+Two variants are considered:
+\begin{align}
+  \mathrm{SEC}_{\mathrm{total}} &= \frac{P_{\mathrm{total}}}{\lambda}
+    \quad \left[J/Gb\right] \label{eq:sec_total} \\
+  \mathrm{SEC}_{\mathrm{net}}   &= \frac{P_{\mathrm{net}}}{\lambda}
+    = \frac{P_{\mathrm{total}} - P_{\mathrm{idle}}}{\lambda}
+    \quad \left[J/Gb\right] \label{eq:sec_net}
+\end{align}
+
+\subsection{The Poll-Mode Measurement Paradox}
+
+Equation~\eqref{eq:sec_net} was introduced in the literature to capture
+the \emph{marginal} energy cost of transmitting one additional gigabit,
+isolating the load-dependent component from the fixed idle overhead.
+While this definition is appropriate for interrupt-driven systems (where
+$P_{\mathrm{idle}} \ll P_{\mathrm{total}}$), it produces a misleading
+result for poll-mode drivers.
+
+In \dpdk{}, the CPU polls continuously regardless of load, so
+$P_{\mathrm{idle}} \approx P_{\mathrm{total}} \approx 0.821$\,W at all
+times.
+Consequently, $P_{\mathrm{net}} = P_{\mathrm{total}} - P_{\mathrm{idle}}
+\approx 0$, and \secnet{} approaches zero as throughput increases,
+superficially suggesting near-perfect efficiency.
+In reality, \dpdk{} consumes 0.82\,W regardless of whether it
+forwards 0 or 5\,Gbps.
+
+Table~\ref{tab:sec} and Figure~\ref{fig:sec_paradox} quantify this
+discrepancy at high throughput ($>1$\,Gbps).
+
+\begin{table}[htbp]
+  \centering
+  \caption{Specific Energy Consumption at high throughput ($>$\,1\,Gbps):
+    median values.}
+  \label{tab:sec}
+  \begin{tabular}{lrr}
+    \toprule
+    \textbf{Metric} & \textbf{SD-Core DPDK} & \textbf{USR-UPF} \\
+    \midrule
+    Total power at $>$1\,Gbps (W)             & $0.824$ & $3.478$ \\
+    \sectable{} (J/Gb) & $0.274$ & $1.615$ \\
+    \secnet{} (J/Gb)   & $0.002$ & $1.607$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{\figpath{fig5_sec_paradox}}
+  \caption{Specific Energy Consumption versus throughput.
+    (a)~\sectable{}: DPDK appears efficient due to low power denominator
+    relative to flat numerator.
+    (b)~\secnet{}: DPDK\textquoteleft s \secnet{} collapses to near zero
+    because its incremental power $P_{\mathrm{net}} \approx 0$.
+    Both metrics understate the operational energy cost of running a
+    poll-mode UPF. Extreme low-throughput outliers are clipped to the
+    98th percentile for clarity.}
+  \label{fig:sec_paradox}
+\end{figure}
+
+\subsection{Implications for Energy Metric Selection}
+
+For a fair cross-variant comparison, \sectable{} is the more honest
+metric: it reflects the full operational cost of sustaining throughput $\lambda$.
+At $>1$\,Gbps, DPDK achieves 0.27\,J/Gb and USR achieves
+1.61\,J/Gb---a 6$\times$ difference in total power
+per bit.
+However, total power consumption must also be considered in absolute terms:
+at idle, DPDK draws 0.82\,W whereas USR draws less than
+0.04\,W.
+The preferable variant therefore depends on the traffic load distribution
+in deployment.
+
+% ── Section 6: Correlation Analysis ─────────────────────────────────────────
+\section{Feature Correlation Analysis}
+\label{sec:correlation}
+
+\subsection{Correlates of Power Consumption}
+
+Table~\ref{tab:correlations} lists the ten strongest Pearson correlations
+with \texttt{power\_watts} in the pooled dataset (excluding features derived
+directly from the target).
+
+\begin{table}[htbp]
+  \centering
+  \caption{Top feature correlations with power consumption (pooled dataset).
+    Rolling features are marked~$\dagger$ to indicate data-leakage risk when
+    used as predictors.}
+  \label{tab:correlations}
+  \begin{tabular}{lcc}
+    \toprule
+    \textbf{Feature} & \textbf{Pearson $r$} & \textbf{Note} \\
+    \midrule
+    \texttt{power\_watts\_roll\_max\_30s}$^\dagger$  & $+0.998$ & Derived from target \\
+    \texttt{cpu\_pct}                                & $+0.991$ & Strong legitimate predictor \\
+    \texttt{power\_watts\_roll\_mean\_30s}$^\dagger$ & $+0.982$ & Derived from target \\
+    \texttt{cpu\_per\_watt}                          & $-0.936$ & Derived from target \\
+    \texttt{dl\_delay\_power\_product}               & $+0.797$ & Interaction feature \\
+    \texttt{high\_delay\_frac}                       & $+0.768$ & QoS indicator \\
+    \texttt{weighted\_mean\_delay\_us}               & $+0.735$ & Latency feature \\
+    \texttt{ul\_delay\_power\_product}               & $+0.614$ & Interaction feature \\
+    \texttt{l2l3\_overhead\_ratio}                   & $-0.561$ & Encapsulation efficiency \\
+    \texttt{packets\_lost\_delta}                    & $+0.535$ & Loss indicator \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Figure~\ref{fig:correlation_heatmaps} shows the correlation structure
+separately for each variant.
+The two variants exhibit markedly different correlation patterns: in
+\dpdk{}, power is weakly correlated with all traffic metrics ($r < 0.5$)
+because the power signal is nearly flat; in \usr{}, the throughput--power
+correlation is $r = 0.81$ and CPU--power is $r = 0.92$, making power highly
+predictable from traffic observables.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{\figpath{fig6_correlation_heatmaps}}
+  \caption{Pearson correlation heatmaps for a subset of key features,
+    computed separately for each variant.
+    The DPDK heatmap (left) shows uniformly low correlations with power,
+    consistent with the near-constant power profile.
+    The USR heatmap (right) reveals strong positive correlations between
+    throughput, CPU, and power.}
+  \label{fig:correlation_heatmaps}
+\end{figure}
+
+\subsection{Temporal Dynamics}
+
+Figure~\ref{fig:temporal} shows representative power and throughput traces
+within a single high-load run for each variant.
+\dpdk{} exhibits essentially no power variation despite large throughput
+swings; \usr{} tracks load closely until saturation, then power plateaus
+while throughput (offered load) continues to increase.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{\figpath{fig4_temporal_traces}}
+  \caption{Temporal power and throughput traces for representative
+    high-load runs. SD-Core DPDK (top): power remains flat despite
+    throughput variations. USR-UPF (bottom): power rises with load until
+    the saturation plateau.}
+  \label{fig:temporal}
+\end{figure}
+
+% ── Section 7: Implications ──────────────────────────────────────────────────
+\section{Discussion and Implications}
+\label{sec:implications}
+
+\subsection{Architectural Trade-offs}
+
+The measurements reveal a fundamental trade-off between the two I/O paradigms:
+
+\begin{description}
+  \item[Poll mode (DPDK)] delivers superior throughput ($5.06$ vs
+    $2.33$\,Gbps), zero packet loss, and deterministically low latency, at
+    the cost of a fixed power floor of 0.82\,W regardless of load.
+    This is appropriate for high-throughput, latency-sensitive deployments
+    where the UPF is expected to be consistently busy.
+  \item[Interrupt mode (USR)] scales power proportionally to load,
+    drawing near-zero power at idle, but saturates at
+    $\approx$0.5\,Gbps and incurs severe delay and loss
+    in the saturated regime.
+    It is preferable only in low-to-medium load scenarios where
+    energy-proportionality is prioritised over peak throughput.
+\end{description}
+
+\subsection{Safe Operating Regions}
+
+Based on the per-run saturation analysis
+(Section~\ref{sec:saturation}, Figure~\ref{fig:oai_per_run}),
+the practical safe operating boundary for \usr{} is
+$\lambda \leq 0.10\,Gbps$.
+Above this threshold, packet loss becomes probable; above
+0.57\,Gbps, it is near-certain.
+No such constraint applies to \dpdk{} within the measurement range.
+
+\subsection{Implications for Predictive Energy Modelling}
+
+The near-constant power of \dpdk{} presents a challenge for regression-based
+energy models: the target variable has a dynamic range of only 52\,mW,
+approaching the noise floor of Scaphandre.
+Models trained on DPDK data are expected to predict 0.82\,W for
+almost any input; the information content of the traffic features is minimal.
+Per-variant models are therefore strongly recommended over a single pooled model.
+
+For \usr{}, the strong linear relationships ($r > 0.8$) between
+throughput, CPU, and power suggest that simple linear or low-complexity
+tree models may suffice in the unsaturated regime.
+Training should be restricted to the safe operating region
+($\lambda < 0.5$\,Gbps) unless the modelling objective explicitly includes
+the saturated regime.
+
+The rolling power features (\texttt{power\_watts\_roll\_mean\_30s},
+\texttt{power\_watts\_roll\_max\_30s}) achieve very high correlations
+with the power target ($r > 0.98$) and must be excluded as predictors
+when the modelling goal is to predict power from non-power observables.
+
+% ── Section 8: Summary ───────────────────────────────────────────────────────
+\section{Summary}
+\label{sec:summary}
+
+This chapter characterised two 5G UPF implementations under controlled
+load conditions.
+The principal findings are:
+
+\begin{enumerate}
+  \item \textbf{DPDK is power-constant}: total power varies by only
+    52\,mW over the full 0--5\,Gbps load range due to the
+    CPU polling loop. This makes power prediction from traffic features
+    statistically intractable.
+  \item \textbf{USR is power-proportional but capacity-limited}: power
+    scales linearly from $\approx 0$ to $\approx 3.4$\,W, but packet loss
+    becomes near-universal above 0.57\,Gbps. The
+    practical operating boundary is $\approx$0.1\,Gbps.
+  \item \textbf{The SEC measurement paradox}: the \secnet{} metric
+    misleadingly reports near-zero energy efficiency for DPDK because the
+    idle power is almost equal to the load power. Total SEC (\sectable{})
+    is the more operationally meaningful metric.
+  \item \textbf{CPU is the strongest legitimate predictor of power}
+    ($r = 0.99$ pooled), followed by delay-related features.
+    Rolling power features are informative but constitute data leakage
+    when used as predictors of power.
+  \item \textbf{Separate per-variant models are necessary}: the two variants
+    occupy distinct regimes with different predictive structures and cannot
+    be modelled jointly without a variant indicator.
+\end{enumerate}
+
+% ── Bibliography placeholder ─────────────────────────────────────────────────
+\bibliographystyle{IEEEtran}
+% \bibliography{references}  % uncomment and point to your .bib file
+
+\end{document}

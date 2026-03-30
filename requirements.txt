@@ -5,6 +5,7 @@ pandas>=2.0
 scikit-learn>=1.3
 pyyaml>=6.0
 matplotlib>=3.7
+seaborn
 
 # Testing & linting
 pytest>=7.0
@@ -13,3 +14,4 @@ ruff>=0.1.0
 # DVC remote (uncomment the one you use)
 # dvc-gdrive
 # dvc-s3
+ipykernel
