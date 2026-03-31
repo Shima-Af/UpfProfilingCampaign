@@ -31,3 +31,10 @@ reports/*.out
 reports/*.pdf
 
 /models
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Documents and other files
+docs/mlops_booklet.md
+docs/mlops_booklet.pdf
