@@ -515,7 +515,68 @@ The rolling power features (\texttt{power\_watts\_roll\_mean\_30s},
 with the power target ($r > 0.98$) and must be excluded as predictors
 when the modelling goal is to predict power from non-power observables.
 
-% ── Section 8: Two-Layer Digital Twin ────────────────────────────────────────
+% ── Section 8: Variant Performance Summary ───────────────────────────────────
+\section{Variant Performance Summary}
+\label{sec:variant_summary}
+
+Before constructing the digital twin, it is instructive to compare the
+three deployment variants---DPDK, USR (full range), and USR (safe
+regime)---across all five key performance indicators (KPIs): downlink
+throughput, CPU utilisation, packet loss, one-way delay, and power
+consumption.
+Figure~\ref{fig:variant_summary} shows the empirical distributions of each
+KPI as violin plots, with individual measurements overlaid as semi-transparent
+scatter points.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{\figpath{fig13_variant_summary.png}}
+  \caption{Measured KPI distributions for each deployment variant.
+           Each violin combines a kernel-density estimate with the
+           observed range; horizontal bars mark the median.
+           Points are jittered for visibility.
+           DPDK power exhibits near-constant behaviour (poll-mode
+           driver draws fixed power regardless of load), explaining its
+           low model $R^2$.
+           USR (safe) packet loss and delay are compressed near zero
+           (traffic kept below the saturation knee at 0.5\,Gbps),
+           which limits their model predictability compared with the
+           full-range USR variant.}
+  \label{fig:variant_summary}
+\end{figure}
+
+\noindent
+Three structural differences stand out:
+
+\begin{enumerate}
+  \item \textbf{DPDK power is load-independent.}  The poll-mode driver
+        keeps all cores spinning at full speed irrespective of traffic;
+        the power distribution is narrow and flat across all load steps.
+        This is the primary reason the DPDK Layer-2 power model achieves
+        only $R^2 = 0.29$.
+
+  \item \textbf{USR (safe) compresses loss and delay to near-zero.}
+        By restricting the training set to throughput below
+        $0.5$\,Gbps---the stable linear regime---virtually no packet
+        loss or queuing delay is induced.  The resulting low variance
+        makes these two targets harder to fit
+        ($R^2 = 0.86$ and $0.52$ respectively) despite the excellent
+        power and CPU models ($R^2 > 0.999$).
+
+  \item \textbf{USR (full range) covers saturation.}  Including the
+        high-load regime exposes the non-linear onset of loss and delay,
+        yielding $R^2 = 0.998$ and $0.968$ for those targets at the cost
+        of a slightly noisier power model ($R^2 = 0.988$).
+\end{enumerate}
+
+\noindent
+The choice between USR safe and USR full therefore depends on the
+inference context: USR safe is recommended when input loads are
+expected to remain below the saturation knee (e.g.\ NetMob 2023
+real-world traffic), while USR full is preferable when the full
+operating envelope---including congestion---must be captured.
+
+% ── Section 9: Two-Layer Digital Twin ────────────────────────────────────────
 \section{Data-Driven Digital Twin}
 \label{sec:twin}
 

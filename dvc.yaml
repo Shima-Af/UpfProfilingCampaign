@@ -73,3 +73,5 @@ stages:
           cache: false
       - reports/figures/fig12_interpretability.png:
           cache: false
+      - reports/figures/fig13_variant_summary.png:
+          cache: false

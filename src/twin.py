@@ -55,8 +55,11 @@ def _load_pkl(path: str | Path) -> object:
         return pickle.load(f)
 
 
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent
+
+
 def _load_params() -> dict:
-    with open("params.yaml") as f:
+    with open(_PROJECT_ROOT / "params.yaml") as f:
         return yaml.safe_load(f)["train"]
 
 
@@ -192,7 +195,7 @@ class DigitalTwin:
     @classmethod
     def load(
         cls,
-        manifest_path: str | Path = "models/manifest.json",
+        manifest_path: str | Path | None = None,
         variant: str = "usr_safe",
         mode: Literal["full", "lite"] = "full",
         params: dict | None = None,
@@ -207,6 +210,8 @@ class DigitalTwin:
         mode          : "full" or "lite"
         params        : optional pre-loaded params dict (loads params.yaml if None)
         """
+        if manifest_path is None:
+            manifest_path = _PROJECT_ROOT / "models" / "manifest.json"
         if params is None:
             params = _load_params()
 
@@ -225,14 +230,14 @@ class DigitalTwin:
                     f"Run src/train.py first."
                 )
             entry = manifest[key]
-            l1_models[target] = _load_pkl(entry["path"])
+            l1_models[target] = _load_pkl(_PROJECT_ROOT / entry["path"])
 
         # Load L2 model
         l2_key = f"{variant}__layer2__power_watts__{mode}"
         if l2_key not in manifest:
             raise KeyError(f"L2 model not found in manifest: {l2_key}")
         l2_entry   = manifest[l2_key]
-        l2_model   = _load_pkl(l2_entry["path"])
+        l2_model   = _load_pkl(_PROJECT_ROOT / l2_entry["path"])
         l2_features = l2_entry["features"]
 
         adapter = NetMobAdapter.from_params(params)

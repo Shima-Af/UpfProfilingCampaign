@@ -7,6 +7,7 @@ Generates (saved to reports/figures/):
   fig10_algo_comparison_l2.{png,pdf}   — All algorithms compared on L2 power model
   fig11_algo_comparison_l1.{png,pdf}   — All algorithms compared on L1 models (heatmap)
   fig12_interpretability.{png,pdf}     — Ridge coefficients vs tree importances side-by-side
+  fig13_variant_summary.{png,pdf}      — KPI distributions per variant (violin plots)
 """
 from __future__ import annotations
 
@@ -621,6 +622,84 @@ def fig12_interpretability(manifest: dict, mlflow_df: pd.DataFrame):
     savefig(fig, "fig12_interpretability")
 
 
+# ── Figure 13: Variant performance summary — distributions per metric ─────────
+
+def fig13_variant_summary(df: pd.DataFrame, train_params: dict):
+    """
+    Violin plots for each of the 5 KPIs (throughput, CPU, packet loss, delay,
+    power) split by deployment variant (DPDK / USR-full / USR-safe).
+
+    Rows are derived from is_dpdk flag and usr_safe_threshold_gbps.
+    This figure bridges the EDA and digital-twin sections by showing WHY some
+    variants are harder to model (e.g. near-constant DPDK power, near-zero USR
+    safe loss).
+    """
+    threshold = train_params.get("usr_safe_threshold_gbps", 0.5)
+
+    dpdk     = df[df["is_dpdk"] == 1].copy()
+    usr_full = df[df["is_dpdk"] == 0].copy()
+    usr_safe = df[(df["is_dpdk"] == 0) & (df["throughput_gbps"] < threshold)].copy()
+
+    subsets = [
+        ("DPDK",          dpdk,     VARIANT_COLORS["dpdk"]),
+        ("USR\n(full)",   usr_full, VARIANT_COLORS["usr_full"]),
+        ("USR\n(safe)",   usr_safe, VARIANT_COLORS["usr_safe"]),
+    ]
+
+    metrics = [
+        ("throughput_gbps",    "Throughput (Gbps)",  None),
+        ("cpu_pct",            "CPU (%)",            None),
+        ("gtpu_packets_dn__packets_lost_delta",
+                               "Packet Loss (Δpkts)", None),
+        ("downlink_one_way_delay_distribution__weighted_mean_delay_us",
+                               "DL Delay (µs)",       None),
+        ("power_watts",        "Power (W)",           None),
+    ]
+
+    fig, axes = plt.subplots(1, 5, figsize=(18, 5))
+    fig.suptitle(
+        "UPF Deployment Variant Profiles — Measured KPI Distributions",
+        fontsize=13, fontweight="bold", y=1.02,
+    )
+
+    for ax, (col, ylabel, _) in zip(axes, metrics):
+        data   = [s[col].dropna().values for _, s, _ in subsets]
+        colors = [c for _, _, c in subsets]
+        labels = [lbl for lbl, _, _ in subsets]
+
+        parts = ax.violinplot(data, positions=range(len(subsets)),
+                              showmedians=True, showextrema=True)
+
+        for body, color in zip(parts["bodies"], colors):
+            body.set_facecolor(color)
+            body.set_alpha(0.75)
+        parts["cmedians"].set_color("black")
+        parts["cmedians"].set_linewidth(1.8)
+        for key in ("cmins", "cmaxes", "cbars"):
+            parts[key].set_color("black")
+            parts[key].set_linewidth(0.8)
+
+        # Overlay scatter (jittered, semi-transparent)
+        for i, (values, color) in enumerate(zip(data, colors)):
+            jitter = np.random.default_rng(42).uniform(-0.08, 0.08, size=len(values))
+            ax.scatter(i + jitter, values, s=2, color=color, alpha=0.18, zorder=2)
+
+        # Annotate n per group
+        for i, values in enumerate(data):
+            ax.text(i, ax.get_ylim()[0] if ax.get_ylim()[0] != 0 else -0.02 * max(v.max() for v in data if len(v)),
+                    f"n={len(values)}", ha="center", va="top", fontsize=7, color="#555555")
+
+        ax.set_xticks(range(len(subsets)))
+        ax.set_xticklabels(labels, fontsize=9)
+        ax.set_ylabel(ylabel, fontsize=9)
+        ax.set_title(ylabel.split(" (")[0], fontsize=10, fontweight="bold")
+        ax.yaxis.grid(True, linestyle="--", alpha=0.5)
+        ax.set_axisbelow(True)
+
+    fig.tight_layout()
+    savefig(fig, "fig13_variant_summary")
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
@@ -649,6 +728,9 @@ def main():
 
     print("\n[fig12] Interpretability: Ridge coef vs tree importances ...")
     fig12_interpretability(manifest, mlflow_df)
+
+    print("\n[fig13] Variant performance summary ...")
+    fig13_variant_summary(df, train_params)
 
     print("\nAll evaluation figures saved to reports/figures/")
 

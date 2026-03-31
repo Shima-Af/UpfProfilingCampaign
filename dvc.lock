@@ -185,8 +185,8 @@ stages:
       nfiles: 32
     - path: src/evaluate.py
       hash: md5
-      md5: 1fe1d2a061e097731b4e91de4296a902
-      size: 27557
+      md5: 226d182f7f0b06a1a1dddd73d69f44df
+      size: 31053
     params:
       params.yaml:
         train:
@@ -235,21 +235,25 @@ stages:
     outs:
     - path: reports/figures/fig10_algo_comparison_l2.png
       hash: md5
-      md5: 8e230b8f6b195187a2b2cdf76e8ca6e9
-      size: 65621
+      md5: 20ee1926f07ab17933d5412015469955
+      size: 65707
     - path: reports/figures/fig11_algo_comparison_l1.png
       hash: md5
-      md5: 690b87874f8851844ebaf77cb60e016f
-      size: 162602
+      md5: 808dc91905fc4da9d41d58d1fad40a51
+      size: 162778
     - path: reports/figures/fig12_interpretability.png
       hash: md5
-      md5: ca86433e18a847baccf692b3d9773fc9
-      size: 167648
+      md5: 8a25e53de5e63a49af229428b4c79838
+      size: 167386
+    - path: reports/figures/fig13_variant_summary.png
+      hash: md5
+      md5: 0f72f148d928fac57d9a7de29c22feee
+      size: 218488
     - path: reports/figures/fig8_predicted_vs_actual.png
       hash: md5
-      md5: e3aae8805369b79df931cd3deab8e69a
-      size: 115226
+      md5: d049bf730fba301ed8dee785f1f63048
+      size: 115134
     - path: reports/figures/fig9_r2_heatmap.png
       hash: md5
-      md5: 1ab5e21e5c64f04bb4e9a3ea286a0447
-      size: 68592
+      md5: fe695916b368e76015440bfc9a3a64d6
+      size: 68535
