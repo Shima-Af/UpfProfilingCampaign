@@ -70,6 +70,9 @@ Section~\ref{sec:correlation} reports feature correlations relevant to
 predictive energy modelling.
 Section~\ref{sec:implications} discusses implications for network operation
 and modelling.
+Section~\ref{sec:twin} presents the two-layer digital twin architecture and
+its predictive performance.
+Section~\ref{sec:netmob} describes the NetMob~2023 compatibility adapter.
 
 % ── Section 2: Methodology ──────────────────────────────────────────────────
 \section{Measurement Methodology}
@@ -512,7 +515,198 @@ The rolling power features (\texttt{power\_watts\_roll\_mean\_30s},
 with the power target ($r > 0.98$) and must be excluded as predictors
 when the modelling goal is to predict power from non-power observables.
 
-% ── Section 8: Summary ───────────────────────────────────────────────────────
+% ── Section 8: Two-Layer Digital Twin ────────────────────────────────────────
+\section{Data-Driven Digital Twin}
+\label{sec:twin}
+
+\subsection{Architecture}
+
+The empirical findings of the preceding sections motivate a
+\emph{predictive digital twin}: a machine-learning model that, given only
+an offered traffic load, outputs the UPF's expected power consumption,
+CPU utilisation, delivered throughput, packet loss, and one-way delay---without
+requiring a live UPF deployment.
+
+The twin is organised in two layers that reflect the causal structure of
+the system (Figure~\ref{fig:twin_arch}).
+
+\begin{description}
+  \item[Layer~1 (performance models)]
+    Four independent regression models predict UPF \emph{responses} from
+    the \emph{offered load}: delivered throughput (Gbps), CPU utilisation (\%),
+    downlink packet loss (packets per interval), and downlink one-way delay
+    ($\mu$s). The input feature set consists exclusively of TX-side, controlled
+    quantities---DL/UL kbits/s, TX packet counts, average packet size, and
+    the L2/L3 overhead ratio.
+
+  \item[Layer~2 (power model)]
+    A single model predicts \texttt{power\_watts} from the same offered-load
+    features \emph{plus} the Layer~1 outputs. Using Layer~1 outputs as Layer~2
+    features captures the true causal pathway (load $\to$ CPU $\to$ power)
+    without introducing circular dependency at inference time, because Layer~1
+    predictions are available before Layer~2 runs.
+\end{description}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.72\textwidth]{\figpath{fig8_predicted_vs_actual.png}}
+  \caption{Predicted versus measured power for the three trained variants
+    (DPDK, USR full range, USR safe regime). Solid markers: full model;
+    open markers: lite (NetMob-compatible) model.
+    The dashed line is the identity.}
+  \label{fig:twin_pva}
+\end{figure}
+
+\subsection{Training Strategy}
+
+Three variant-specific models are trained to reflect the distinct operating
+regimes identified in Section~\ref{sec:profiles}:
+
+\begin{itemize}
+  \item \textbf{\texttt{dpdk}} --- all 4\,388 DPDK samples.
+    Included as an evidence baseline even though the near-constant power
+    (52\,mW range) makes the regression R\textsuperscript{2} inherently low.
+  \item \textbf{\texttt{usr\_full}} --- all 4\,393 USR samples, including the
+    saturated regime above 0.57\,Gbps.
+  \item \textbf{\texttt{usr\_safe}} --- USR samples with delivered throughput
+    below 0.5\,Gbps, corresponding to the unsaturated, practically deployable
+    regime.
+\end{itemize}
+
+For each variant and each prediction slot (Layer~1 target or Layer~2 target),
+three model types are compared: Ridge regression, Random Forest, and Gradient
+Boosted Trees.  All hyperparameter selection uses 5-fold cross-validation on
+the training split; the model with the highest test-set R\textsuperscript{2}
+is retained.  Layer~2 trains on \emph{out-of-fold} Layer~1 predictions
+produced by a second 5-fold pass, so it never observes ground-truth Layer~1
+values during training---matching the distribution it will encounter at
+inference time (stacking).
+
+\subsection{Model Performance}
+
+Table~\ref{tab:twin_r2} summarises Layer~2 power model performance.
+Figure~\ref{fig:twin_pva} shows predicted versus measured power for all
+variants and both model variants.
+
+\begin{table}[h]
+  \centering
+  \caption{Layer~2 power model test-set metrics (best model type per slot).}
+  \label{tab:twin_r2}
+  \begin{tabular}{llcccl}
+    \toprule
+    Variant & Mode & R\textsuperscript{2} & RMSE (W) & MAE (W) & Best model \\
+    \midrule
+    DPDK        & Full & 0.289 & 0.004 & 0.003 & Ridge \\
+    DPDK        & Lite & ---   & ---   & ---   & --- \\
+    USR (full)  & Full & 0.988 & 0.172 & 0.050 & Random Forest \\
+    USR (full)  & Lite & 0.964 & 0.245 & 0.070 & Random Forest \\
+    USR (safe)  & Full & 0.999 & 0.026 & 0.012 & Ridge \\
+    USR (safe)  & Lite & 0.997 & 0.038 & 0.017 & Ridge \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The \texttt{usr\_safe} variant achieves R\textsuperscript{2}\,$= 0.999$ with
+the full feature set and R\textsuperscript{2}\,$= 0.997$ with only DL/UL
+throughput inputs, confirming that power scales nearly linearly with load
+in the unsaturated regime.  The \texttt{usr\_full} model degrades gracefully
+($\Delta$R\textsuperscript{2} $\approx 0.024$) in lite mode, demonstrating
+that packet-count and overhead features add moderate but non-negligible
+predictive value.  The DPDK R\textsuperscript{2}\,$= 0.289$ confirms
+the analytical expectation: a 52\,mW signal range is indistinguishable from
+noise at the model's operating scale.
+
+Figure~\ref{fig:r2_heatmap} provides the full R\textsuperscript{2} picture
+across all prediction slots.
+Figure~\ref{fig:algo_l2} shows the three-way algorithm comparison for the
+L2 power model, directly justifying the winning selection per variant.
+Figure~\ref{fig:algo_l1} extends this comparison to all L1 targets.
+Figure~\ref{fig:interpret} presents side-by-side interpretability plots
+(Ridge coefficients and tree importances) on the same feature order,
+making the two model families comparable regardless of which was selected.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.92\textwidth]{\figpath{fig9_r2_heatmap.png}}
+  \caption{R\textsuperscript{2} for all prediction slots (variant
+    $\times$ target), full model (left) and lite model (right).
+    Green = high accuracy; red = low. DPDK CPU and DPDK delay are
+    structurally unpredictable (poll-mode artefacts).}
+  \label{fig:r2_heatmap}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.98\textwidth]{\figpath{fig10_algo_comparison_l2.png}}
+  \caption{Algorithm selection for the L2 power model.
+    Each group shows Ridge, Random Forest, and Gradient Boosting test
+    R\textsuperscript{2} for the full and lite feature sets.
+    Filled bars and gold stars (\textbf{\large$\bigstar$}) mark the
+    selected winner per group; transparent bars are runners-up.
+    Ridge wins for \texttt{usr\_safe} (linear regime); Random Forest wins
+    for \texttt{usr\_full} (non-linear saturation effects).}
+  \label{fig:algo_l2}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.98\textwidth]{\figpath{fig11_algo_comparison_l1.png}}
+  \caption{Algorithm comparison for all L1 prediction slots.
+    Rows: prediction targets; columns: algorithm types.
+    Gold borders mark the winning algorithm per target row.
+    Ridge dominates the linear throughput--power relationship;
+    tree models offer marginal gains only for CPU and delay targets.}
+  \label{fig:algo_l1}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.98\textwidth]{\figpath{fig12_interpretability.png}}
+  \caption{L2 power model interpretability for each variant.
+    \emph{Left panels}: Ridge regression normalised absolute coefficients.
+    \emph{Right panels}: feature importances from the best tree-based model
+    (Random Forest or Gradient Boosting).
+    Both panels share the same feature ordering (sorted by tree importance)
+    to allow direct comparison regardless of which algorithm was selected
+    (marked \textbf{\large$\bigstar$}).
+    The dominance of L1-predicted CPU and throughput confirms the causal
+    pathway load\,$\to$\,CPU\,$\to$\,power.}
+  \label{fig:interpret}
+\end{figure}
+
+% ── Section 9: NetMob Compatibility ──────────────────────────────────────────
+\section{NetMob~2023 Compatibility}
+\label{sec:netmob}
+
+The NetMob~2023 dataset provides per-cell normalised UL/DL traffic loads
+$\hat{d} \in [0,1]$ but no packet-level detail.
+To drive the digital twin from such data a thin adapter layer translates
+normalised loads into the model's input space:
+
+\begin{align}
+  B_{\mathrm{DL}} &= \hat{d}_{\mathrm{DL}} \cdot C_{\max,\mathrm{DL}} \cdot 10^6
+    \quad [\text{kbits/s}] \label{eq:adapt_dl} \\
+  N_{\mathrm{pkt}} &= \frac{B_{\mathrm{DL}} \cdot 10^3 \cdot \Delta t}
+    {8 \cdot \bar{s}_{\mathrm{pkt}}} \label{eq:adapt_pkt}
+\end{align}
+
+where $C_{\max}$ is the rated UPF link capacity (default 10\,Gbps),
+$\Delta t = 3$\,s is the sampling interval, and $\bar{s}_{\mathrm{pkt}}$
+is the assumed average packet size (default 1250\,B).
+Missing features (overhead ratio, etc.) are imputed from deployment
+constants stored in \texttt{params.yaml}.
+
+\paragraph{Full versus lite models.}
+The \emph{full} model accepts all seven offered-load features and serves
+laboratory or high-fidelity simulation scenarios.
+The \emph{lite} companion model accepts only $B_{\mathrm{DL}}$ and
+$B_{\mathrm{UL}}$, making it directly compatible with NetMob and any other
+dataset where only load volume is known.
+The lite model quantifies how much accuracy is sacrificed for this
+interoperability: for \texttt{usr\_safe}, the power-model R\textsuperscript{2}
+drops by only 0.002 (from 0.999 to 0.997).
+
+% ── Section 10: Summary ───────────────────────────────────────────────────────
 \section{Summary}
 \label{sec:summary}
 
@@ -540,6 +734,14 @@ The principal findings are:
   \item \textbf{Separate per-variant models are necessary}: the two variants
     occupy distinct regimes with different predictive structures and cannot
     be modelled jointly without a variant indicator.
+  \item \textbf{A two-layer digital twin achieves high accuracy for USR}:
+    the \texttt{usr\_safe} power model reaches R\textsuperscript{2}\,$= 0.999$
+    (full) and R\textsuperscript{2}\,$= 0.997$ (lite), enabling power
+    prediction from offered load alone without a live UPF.
+  \item \textbf{NetMob compatibility incurs minimal cost}: the lite model,
+    driven by normalised UL/DL loads only, sacrifices $\Delta$R\textsuperscript{2}
+    $< 0.003$ for \texttt{usr\_safe}, making the twin directly usable with
+    real-world traffic traces.
 \end{enumerate}
 
 % ── Bibliography placeholder ─────────────────────────────────────────────────

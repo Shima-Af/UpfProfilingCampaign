@@ -105,3 +105,147 @@ stages:
       hash: md5
       md5: 04497319167520a102d66985238ad005
       size: 4578338
+  train:
+    cmd: python src/train.py
+    deps:
+    - path: data/processed/features.csv
+      hash: md5
+      md5: 04497319167520a102d66985238ad005
+      size: 4578338
+    - path: src/train.py
+      hash: md5
+      md5: 95a7ec21ea37f02aa3f1ee837f56e9e4
+      size: 21885
+    params:
+      params.yaml:
+        train:
+          target: power_watts
+          test_split: 0.2
+          random_state: 42
+          usr_safe_threshold_gbps: 0.5
+          cv_folds: 5
+          search_n_iter: 20
+          models:
+          - ridge
+          - random_forest
+          - gradient_boosting
+          layer1_targets:
+          - throughput_gbps
+          - cpu_pct
+          - gtpu_packets_dn__packets_lost_delta
+          - downlink_one_way_delay_distribution__weighted_mean_delay_us
+          layer1_features:
+          - gtpu_kbitss_dn__kbits_tx_s
+          - gtpu_kbitss_ngran__gtpu_kbits_tx_s
+          - gtpu_packets_dn__packets_tx_delta
+          - gtpu_packets_ngran__gtpu_packets_tx_delta
+          - user_plane_throughput__l2_3_device_tx_traffic
+          - avg_packet_size_bytes
+          - l2l3_overhead_ratio
+          lite_features:
+          - gtpu_kbitss_dn__kbits_tx_s
+          - gtpu_kbitss_ngran__gtpu_kbits_tx_s
+          adapter:
+            c_max_dl_gbps: 10.0
+            c_max_ul_gbps: 10.0
+            avg_packet_size_bytes: 1250
+            interval_sec: 3
+          leakage_cols:
+          - power_watts
+          - net_power_watts
+          - sec_total
+          - sec_net
+          - power_watts_roll_mean_30s
+          - power_watts_roll_std_30s
+          - power_watts_roll_max_30s
+          - cpu_per_watt
+          - idle_cpu_pct
+          - is_dpdk
+    outs:
+    - path: models/
+      hash: md5
+      md5: a92ad2caa7f058b85e582261594b17b4.dir
+      size: 48886108
+      nfiles: 32
+    - path: reports/metrics.json
+      hash: md5
+      md5: 6388a0d94c90010a1ffcb129b9634cc1
+      size: 365
+  evaluate:
+    cmd: python src/evaluate.py
+    deps:
+    - path: data/processed/features.csv
+      hash: md5
+      md5: 04497319167520a102d66985238ad005
+      size: 4578338
+    - path: models/
+      hash: md5
+      md5: a92ad2caa7f058b85e582261594b17b4.dir
+      size: 48886108
+      nfiles: 32
+    - path: src/evaluate.py
+      hash: md5
+      md5: f4fc4d313a90738adb15f55adf52b42c
+      size: 14211
+    params:
+      params.yaml:
+        train:
+          target: power_watts
+          test_split: 0.2
+          random_state: 42
+          usr_safe_threshold_gbps: 0.5
+          cv_folds: 5
+          search_n_iter: 20
+          models:
+          - ridge
+          - random_forest
+          - gradient_boosting
+          layer1_targets:
+          - throughput_gbps
+          - cpu_pct
+          - gtpu_packets_dn__packets_lost_delta
+          - downlink_one_way_delay_distribution__weighted_mean_delay_us
+          layer1_features:
+          - gtpu_kbitss_dn__kbits_tx_s
+          - gtpu_kbitss_ngran__gtpu_kbits_tx_s
+          - gtpu_packets_dn__packets_tx_delta
+          - gtpu_packets_ngran__gtpu_packets_tx_delta
+          - user_plane_throughput__l2_3_device_tx_traffic
+          - avg_packet_size_bytes
+          - l2l3_overhead_ratio
+          lite_features:
+          - gtpu_kbitss_dn__kbits_tx_s
+          - gtpu_kbitss_ngran__gtpu_kbits_tx_s
+          adapter:
+            c_max_dl_gbps: 10.0
+            c_max_ul_gbps: 10.0
+            avg_packet_size_bytes: 1250
+            interval_sec: 3
+          leakage_cols:
+          - power_watts
+          - net_power_watts
+          - sec_total
+          - sec_net
+          - power_watts_roll_mean_30s
+          - power_watts_roll_std_30s
+          - power_watts_roll_max_30s
+          - cpu_per_watt
+          - idle_cpu_pct
+          - is_dpdk
+    outs:
+    - path: reports/figures/fig10_full_vs_lite_gap.png
+      hash: md5
+      md5: 5a4176f511881b60973a257e5c07f1f3
+      size: 42085
+    - path: reports/figures/fig11_feature_importance.png
+      hash: md5
+      md5: 12d27bbcd870a564b03b33696bc72ccd
+      size: 78344
+    - path: reports/figures/fig8_predicted_vs_actual.png
+      hash: md5
+      md5: e3aae8805369b79df931cd3deab8e69a
+      size: 115226
+    - path: reports/figures/fig9_r2_heatmap.png
+      hash: md5
+      md5: 1ab5e21e5c64f04bb4e9a3ea286a0447
+      size: 68592

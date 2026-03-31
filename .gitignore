@@ -28,4 +28,6 @@ Thumbs.db
 reports/*.aux
 reports/*.log
 reports/*.out
+reports/*.pdf
 
+/models

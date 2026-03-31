@@ -49,7 +49,7 @@ stages:
     params:
       - train
     outs:
-      - models/model.pkl
+      - models/
     metrics:
       - reports/metrics.json:
           cache: false
@@ -58,10 +58,18 @@ stages:
     cmd: python src/evaluate.py
     deps:
       - src/evaluate.py
-      - models/model.pkl
+      - models/
       - data/processed/features.csv
     params:
-      - evaluate
+      - train
     plots:
-      - reports/figures/feature_importance.png:
+      - reports/figures/fig8_predicted_vs_actual.png:
+          cache: false
+      - reports/figures/fig9_r2_heatmap.png:
+          cache: false
+      - reports/figures/fig10_algo_comparison_l2.png:
+          cache: false
+      - reports/figures/fig11_algo_comparison_l1.png:
+          cache: false
+      - reports/figures/fig12_interpretability.png:
           cache: false

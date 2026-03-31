@@ -1,0 +1,302 @@
+[
+  {
+    "variant": "dpdk",
+    "layer": "layer1",
+    "target": "throughput_gbps",
+    "model_variant": "full",
+    "mae": 0.003259253926938434,
+    "rmse": 0.050204246063892774,
+    "r2": 0.9987679521575059,
+    "best_model": "ridge"
+  },
+  {
+    "variant": "dpdk",
+    "layer": "layer1",
+    "target": "throughput_gbps",
+    "model_variant": "lite",
+    "mae": 0.0024867078491293045,
+    "rmse": 0.052218660101046095,
+    "r2": 0.9986670983016045,
+    "best_model": "ridge"
+  },
+  {
+    "variant": "dpdk",
+    "layer": "layer1",
+    "target": "cpu_pct",
+    "model_variant": "full",
+    "mae": 0.003041236515010249,
+    "rmse": 0.0038340152248766,
+    "r2": 0.015433404959965147,
+    "best_model": "random_forest"
+  },
+  {
+    "variant": "dpdk",
+    "layer": "layer1",
+    "target": "cpu_pct",
+    "model_variant": "lite",
+    "mae": 0.00306360456897014,
+    "rmse": 0.0038701458348135466,
+    "r2": -0.0032105513675912967,
+    "best_model": "ridge"
+  },
+  {
+    "variant": "dpdk",
+    "layer": "layer1",
+    "target": "gtpu_packets_dn__packets_lost_delta",
+    "model_variant": "full",
+    "mae": 0.0,
+    "rmse": 0.0,
+    "r2": 1.0,
+    "best_model": "ridge"
+  },
+  {
+    "variant": "dpdk",
+    "layer": "layer1",
+    "target": "gtpu_packets_dn__packets_lost_delta",
+    "model_variant": "lite",
+    "mae": 0.0,
+    "rmse": 0.0,
+    "r2": 1.0,
+    "best_model": "ridge"
+  },
+  {
+    "variant": "dpdk",
+    "layer": "layer1",
+    "target": "downlink_one_way_delay_distribution__weighted_mean_delay_us",
+    "model_variant": "full",
+    "mae": 279.6464536212011,
+    "rmse": 1520.011894965971,
+    "r2": 0.6159867280388114,
+    "best_model": "random_forest"
+  },
+  {
+    "variant": "dpdk",
+    "layer": "layer1",
+    "target": "downlink_one_way_delay_distribution__weighted_mean_delay_us",
+    "model_variant": "lite",
+    "mae": 376.2868673575061,
+    "rmse": 2026.1936980326898,
+    "r2": 0.3176390239262433,
+    "best_model": "random_forest"
+  },
+  {
+    "variant": "dpdk",
+    "layer": "layer2",
+    "target": "power_watts",
+    "model_variant": "full",
+    "mae": 0.0030960177218592837,
+    "rmse": 0.003936506404196561,
+    "r2": 0.28926695045635265,
+    "best_model": "random_forest"
+  },
+  {
+    "variant": "dpdk",
+    "layer": "layer2",
+    "target": "power_watts",
+    "model_variant": "lite",
+    "mae": 0.0031111202293030568,
+    "rmse": 0.003961322339988854,
+    "r2": 0.2802777108763721,
+    "best_model": "random_forest"
+  },
+  {
+    "variant": "usr_full",
+    "layer": "layer1",
+    "target": "throughput_gbps",
+    "model_variant": "full",
+    "mae": 0.009968719317400834,
+    "rmse": 0.03319387345841041,
+    "r2": 0.9983904945506386,
+    "best_model": "random_forest"
+  },
+  {
+    "variant": "usr_full",
+    "layer": "layer1",
+    "target": "throughput_gbps",
+    "model_variant": "lite",
+    "mae": 0.017537294786531595,
+    "rmse": 0.051325892654143605,
+    "r2": 0.9961518711453868,
+    "best_model": "random_forest"
+  },
+  {
+    "variant": "usr_full",
+    "layer": "layer1",
+    "target": "cpu_pct",
+    "model_variant": "full",
+    "mae": 0.04396507078572622,
+    "rmse": 0.15236738491853083,
+    "r2": 0.9905933935826485,
+    "best_model": "gradient_boosting"
+  },
+  {
+    "variant": "usr_full",
+    "layer": "layer1",
+    "target": "cpu_pct",
+    "model_variant": "lite",
+    "mae": 0.08403726624877425,
+    "rmse": 0.2765710651638745,
+    "r2": 0.969007084654211,
+    "best_model": "gradient_boosting"
+  },
+  {
+    "variant": "usr_full",
+    "layer": "layer1",
+    "target": "gtpu_packets_dn__packets_lost_delta",
+    "model_variant": "full",
+    "mae": 3069.686555254993,
+    "rmse": 9080.971866844258,
+    "r2": 0.9983715847720408,
+    "best_model": "gradient_boosting"
+  },
+  {
+    "variant": "usr_full",
+    "layer": "layer1",
+    "target": "gtpu_packets_dn__packets_lost_delta",
+    "model_variant": "lite",
+    "mae": 4336.7440084153795,
+    "rmse": 13733.396083459542,
+    "r2": 0.9962755994174284,
+    "best_model": "random_forest"
+  },
+  {
+    "variant": "usr_full",
+    "layer": "layer1",
+    "target": "downlink_one_way_delay_distribution__weighted_mean_delay_us",
+    "model_variant": "full",
+    "mae": 730.8691040265315,
+    "rmse": 1595.470073129416,
+    "r2": 0.9678620331784695,
+    "best_model": "random_forest"
+  },
+  {
+    "variant": "usr_full",
+    "layer": "layer1",
+    "target": "downlink_one_way_delay_distribution__weighted_mean_delay_us",
+    "model_variant": "lite",
+    "mae": 974.8573942156419,
+    "rmse": 2119.4796955032116,
+    "r2": 0.943284783516504,
+    "best_model": "random_forest"
+  },
+  {
+    "variant": "usr_full",
+    "layer": "layer2",
+    "target": "power_watts",
+    "model_variant": "full",
+    "mae": 0.050212238387843576,
+    "rmse": 0.1718908312525014,
+    "r2": 0.9878975291468789,
+    "best_model": "random_forest"
+  },
+  {
+    "variant": "usr_full",
+    "layer": "layer2",
+    "target": "power_watts",
+    "model_variant": "lite",
+    "mae": 0.08902327946082186,
+    "rmse": 0.2972260285604858,
+    "r2": 0.9638138566743982,
+    "best_model": "random_forest"
+  },
+  {
+    "variant": "usr_safe",
+    "layer": "layer1",
+    "target": "throughput_gbps",
+    "model_variant": "full",
+    "mae": 3.2899844641121054e-05,
+    "rmse": 0.00012765980860029115,
+    "r2": 0.999998283980484,
+    "best_model": "ridge"
+  },
+  {
+    "variant": "usr_safe",
+    "layer": "layer1",
+    "target": "throughput_gbps",
+    "model_variant": "lite",
+    "mae": 1.236136835327868e-05,
+    "rmse": 8.163414629322856e-05,
+    "r2": 0.999999298290178,
+    "best_model": "ridge"
+  },
+  {
+    "variant": "usr_safe",
+    "layer": "layer1",
+    "target": "cpu_pct",
+    "model_variant": "full",
+    "mae": 0.012899873927531703,
+    "rmse": 0.02792986733755387,
+    "r2": 0.9991650949328722,
+    "best_model": "random_forest"
+  },
+  {
+    "variant": "usr_safe",
+    "layer": "layer1",
+    "target": "cpu_pct",
+    "model_variant": "lite",
+    "mae": 0.019732920185534172,
+    "rmse": 0.05706991262091328,
+    "r2": 0.9965141092951444,
+    "best_model": "random_forest"
+  },
+  {
+    "variant": "usr_safe",
+    "layer": "layer1",
+    "target": "gtpu_packets_dn__packets_lost_delta",
+    "model_variant": "full",
+    "mae": 0.5023583299362048,
+    "rmse": 3.1270535019172043,
+    "r2": 0.8614980703987032,
+    "best_model": "gradient_boosting"
+  },
+  {
+    "variant": "usr_safe",
+    "layer": "layer1",
+    "target": "gtpu_packets_dn__packets_lost_delta",
+    "model_variant": "lite",
+    "mae": 1.2737735178146188,
+    "rmse": 8.319951729553438,
+    "r2": 0.01954692344241904,
+    "best_model": "ridge"
+  },
+  {
+    "variant": "usr_safe",
+    "layer": "layer1",
+    "target": "downlink_one_way_delay_distribution__weighted_mean_delay_us",
+    "model_variant": "full",
+    "mae": 13.395637068525064,
+    "rmse": 37.939331465498086,
+    "r2": 0.5175067469266752,
+    "best_model": "random_forest"
+  },
+  {
+    "variant": "usr_safe",
+    "layer": "layer1",
+    "target": "downlink_one_way_delay_distribution__weighted_mean_delay_us",
+    "model_variant": "lite",
+    "mae": 13.073774622638705,
+    "rmse": 37.59181529690604,
+    "r2": 0.5263053351084795,
+    "best_model": "random_forest"
+  },
+  {
+    "variant": "usr_safe",
+    "layer": "layer2",
+    "target": "power_watts",
+    "model_variant": "full",
+    "mae": 0.012083002063949981,
+    "rmse": 0.025606434524730614,
+    "r2": 0.9990219113896975,
+    "best_model": "ridge"
+  },
+  {
+    "variant": "usr_safe",
+    "layer": "layer2",
+    "target": "power_watts",
+    "model_variant": "lite",
+    "mae": 0.014610306687323243,
+    "rmse": 0.04350905113450488,
+    "r2": 0.9971761657332536,
+    "best_model": "random_forest"
+  }
+]
