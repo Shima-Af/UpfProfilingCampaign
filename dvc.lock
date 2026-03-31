@@ -185,8 +185,8 @@ stages:
       nfiles: 32
     - path: src/evaluate.py
       hash: md5
-      md5: f4fc4d313a90738adb15f55adf52b42c
-      size: 14211
+      md5: 1fe1d2a061e097731b4e91de4296a902
+      size: 27557
     params:
       params.yaml:
         train:
@@ -233,14 +233,18 @@ stages:
           - idle_cpu_pct
           - is_dpdk
     outs:
-    - path: reports/figures/fig10_full_vs_lite_gap.png
+    - path: reports/figures/fig10_algo_comparison_l2.png
       hash: md5
-      md5: 5a4176f511881b60973a257e5c07f1f3
-      size: 42085
-    - path: reports/figures/fig11_feature_importance.png
+      md5: 8e230b8f6b195187a2b2cdf76e8ca6e9
+      size: 65621
+    - path: reports/figures/fig11_algo_comparison_l1.png
       hash: md5
-      md5: 12d27bbcd870a564b03b33696bc72ccd
-      size: 78344
+      md5: 690b87874f8851844ebaf77cb60e016f
+      size: 162602
+    - path: reports/figures/fig12_interpretability.png
+      hash: md5
+      md5: ca86433e18a847baccf692b3d9773fc9
+      size: 167648
     - path: reports/figures/fig8_predicted_vs_actual.png
       hash: md5
       md5: e3aae8805369b79df931cd3deab8e69a
