@@ -361,7 +361,7 @@ def fig10_algo_comparison_l2(mlflow_df: pd.DataFrame, manifest: dict):
                 r2_val = r2_by_algo.get(algo, np.nan)
                 is_winner = (algo == winner)
 
-                bar = ax.bar(
+                ax.bar(
                     x, r2_val if not np.isnan(r2_val) else 0,
                     width=bar_w * 0.88,
                     color=ALGO_COLORS[algo],
@@ -427,7 +427,7 @@ def fig11_algo_comparison_l1(mlflow_df: pd.DataFrame, train_params: dict):
     fig, axes = plt.subplots(len(variants), len(modes), figsize=(12, 9))
 
     # Use a masked colormap so NaN cells render in a neutral grey
-    cmap = plt.cm.RdYlGn.copy()
+    cmap = plt.get_cmap("RdYlGn").copy()
     cmap.set_bad(color="#cccccc")
 
     for row_i, variant in enumerate(variants):
