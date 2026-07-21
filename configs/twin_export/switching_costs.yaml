@@ -1,0 +1,47 @@
+# UPF activation cost — measurement provenance and scaling rule
+# This file holds RAW MEASUREMENTS from a colleague's machine.
+# Do not edit values; they are anchors for the scaling rule below.
+
+source:
+  description: "UPF activation cost from RAPL package-0 measurements (100 iterations each)"
+  reports:
+    dpdk: "BESS_UPF report  (2026-02-23) — command: scripts/docker_setup_mellanox.sh"
+    usr:  "OAI_UPF  report  (2026-02-26) — command: docker compose up"
+  source_machine_baseline_w:
+    dpdk: 20.080
+    usr:  19.908
+  notes: |
+    Different machine than the surrogate's profiling host, so absolute Wh
+    figures are NOT directly portable.  However, two quantities transfer
+    well across machines for the same software stack:
+      1. Activation duration (seconds) — depends on driver init time, not
+         on the host's idle power.
+      2. The RULE  spike_wh ≈ steady_state_power_w × activation_s
+         which holds in the source data (validated below).
+
+# === Used by the model =====================================================
+# Hardware-independent: activation duration in seconds.
+activation_duration_s:
+  dpdk: 24.0
+  usr:   3.3
+
+# === Reference only (validates the scaling rule) ===========================
+# Net energy spike measured on the source machine, used to verify that
+# spike_wh ≈ net_power_W × activation_s holds in the data.
+source_measured:
+  dpdk:
+    net_power_w:        34.810   # mean RAPL net (above baseline)
+    activation_s:       24.0
+    spike_wh_measured:   0.232    # 34.81 × 24 / 3600 ≈ 0.232 ✓
+  usr:
+    net_power_w:         7.451
+    activation_s:        3.3
+    spike_wh_measured:   0.007    # 7.45 × 3.3 / 3600 ≈ 0.0068 ✓
+
+# === Scaling rule applied at run-time ======================================
+# spike_wh(target machine, current load L) =
+#     P_steady_target_upf(L) × activation_duration_s / 3600
+#
+# This uses the surrogate's predicted steady-state power (a target-machine
+# quantity) combined with the source-measured activation duration (a
+# software-stack quantity).  Both factors are physically grounded.

@@ -1,0 +1,32 @@
+# UpfProfilingCampaign — parameters snapshot consumed by UpfDigitalTwin
+# Source: https://github.com/Shima-Af/UpfProfilingCampaign
+# This file is a read-only reference; do not edit here.
+
+upf_variants:
+  - dpdk
+  - usr_full
+  - usr_safe
+
+capacity:
+  usr_full_mbps: 700.0
+  usr_safe_mbps: 690.0          # full - 10 Mbps safety margin
+
+layer1_targets:
+  - throughput_gbps
+  - cpu_pct
+  - gtpu_packets_dn__packets_lost_delta
+  - downlink_one_way_delay_distribution__weighted_mean_delay_us
+
+layer2_target: power_watts
+
+# Approximate operating ranges derived from profiling measurements
+operating_ranges:
+  dpdk:
+    power_watts_idle: 0.82
+    power_watts_max: 0.86
+    capacity_gbps: 10.0
+  usr:
+    power_slope_w_per_gbps: 6.8
+    power_watts_idle: 0.015
+    safe_capacity_gbps: 0.69
+    danger_threshold_gbps: 0.70
