@@ -57,6 +57,18 @@ Traffic was generated with a Keysight LoadCore emulator, and power was
 measured at the host level using the Scaphandre process-level power monitor
 with 1\,s sampling resolution.
 
+\paragraph{Place in the thesis.} This thesis concerns \emph{augmented
+observability} for the 5/6G data plane, and this chapter extends the
+observability envelope along its first axis: it makes observable what a
+production core cannot natively measure. Hardware energy counters (RAPL) report
+per-\emph{package} power, not the power drawn by an individual network function;
+per-\upf{} attributed energy and QoS compliance are, in an operational system,
+effectively unmeasurable. The profiling campaign manufactures those signals from
+controlled measurement, and the fitted surrogate that closes the chapter turns
+them into a \emph{virtual sensor} the rest of the stack can query. Every
+downstream component---the forecaster, the twin, and the controllers---ultimately
+grounds its decisions in the quantities made observable here.
+
 The remainder of this chapter is organised as follows.
 Section~\ref{sec:methodology} describes the measurement methodology and
 dataset.
