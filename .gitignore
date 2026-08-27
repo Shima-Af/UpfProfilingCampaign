@@ -38,3 +38,11 @@ reports/*.pdf
 # Documents and other files
 docs/mlops_booklet.md
 docs/mlops_booklet.pdf
+
+# Additional model/report trees produced by the split- and selection-validation
+# reruns (src/train_grouped.py, src/train_nested.py). Same status as /models/:
+# artifacts, not source. The JSON reports under reports_nested/ ARE tracked --
+# they are what the thesis quotes.
+/models_grouped/
+/models_nested/
+/mlflow.db

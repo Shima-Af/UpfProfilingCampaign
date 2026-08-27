@@ -1,0 +1,171 @@
+{
+  "config": {
+    "models_dir": "models_nested",
+    "delay_budget_us": 200.0,
+    "max_loss_pkts": 5.0,
+    "test_runs": 22,
+    "test_samples": 879,
+    "truly_unsafe_frac": 0.30489192263936293
+  },
+  "confusion_measured": {
+    "all": {
+      "n": 879,
+      "n_truly_unsafe": 268,
+      "n_pred_safe": 576,
+      "true_safe": 551,
+      "true_unsafe": 243,
+      "false_safe": 25,
+      "false_unsafe": 60,
+      "accuracy": 0.9032992036405005,
+      "false_safe_rate_given_unsafe": 0.09328358208955224,
+      "unsafe_given_called_safe": 0.043402777777777776,
+      "false_unsafe_rate_given_safe": 0.09819967266775777
+    },
+    "band_50_250_mbps": {
+      "n": 240,
+      "n_truly_unsafe": 10,
+      "n_pred_safe": 237,
+      "true_safe": 228,
+      "true_unsafe": 1,
+      "false_safe": 9,
+      "false_unsafe": 2,
+      "accuracy": 0.9541666666666667,
+      "false_safe_rate_given_unsafe": 0.9,
+      "unsafe_given_called_safe": 0.0379746835443038,
+      "false_unsafe_rate_given_safe": 0.008695652173913044
+    }
+  },
+  "confusion_twin": {
+    "all": {
+      "n": 879,
+      "n_truly_unsafe": 268,
+      "n_pred_safe": 557,
+      "true_safe": 536,
+      "true_unsafe": 247,
+      "false_safe": 21,
+      "false_unsafe": 75,
+      "accuracy": 0.8907849829351536,
+      "false_safe_rate_given_unsafe": 0.07835820895522388,
+      "unsafe_given_called_safe": 0.03770197486535009,
+      "false_unsafe_rate_given_safe": 0.12274959083469722
+    },
+    "band_50_250_mbps": {
+      "n": 240,
+      "n_truly_unsafe": 10,
+      "n_pred_safe": 237,
+      "true_safe": 228,
+      "true_unsafe": 1,
+      "false_safe": 9,
+      "false_unsafe": 2,
+      "accuracy": 0.9541666666666667,
+      "false_safe_rate_given_unsafe": 0.9,
+      "unsafe_given_called_safe": 0.0379746835443038,
+      "false_unsafe_rate_given_safe": 0.008695652173913044
+    }
+  },
+  "informativeness_by_band": {
+    "all": {
+      "n": 879,
+      "safe_base_rate": 0.6951080773606371,
+      "majority_baseline": 0.6951080773606371,
+      "accuracy": 0.8907849829351536,
+      "balanced_accuracy": 0.8994461001050396,
+      "mcc": 0.7633446212113538
+    },
+    "lt_50_mbps": {
+      "n": 320,
+      "safe_base_rate": 0.9625,
+      "majority_baseline": 0.9625,
+      "accuracy": 0.9625,
+      "balanced_accuracy": 0.5,
+      "mcc": NaN
+    },
+    "50_250_mbps": {
+      "n": 240,
+      "safe_base_rate": 0.9583333333333334,
+      "majority_baseline": 0.9583333333333334,
+      "accuracy": 0.9541666666666667,
+      "balanced_accuracy": 0.5456521739130435,
+      "mcc": 0.16421793109700583
+    },
+    "gt_250_mbps": {
+      "n": 319,
+      "safe_base_rate": 0.22884012539184953,
+      "majority_baseline": 0.7711598746081505,
+      "accuracy": 0.7711598746081505,
+      "balanced_accuracy": 0.5,
+      "mcc": NaN
+    }
+  },
+  "unsafe_attribution": {
+    "loss_only": 13,
+    "delay_only": 16,
+    "both": 239,
+    "safe": 611
+  },
+  "qos_limit_bootstrap": {
+    "point_mbps": 153.0,
+    "ci95_mbps": [
+      81.0,
+      306.0
+    ],
+    "median_mbps": 150.0,
+    "n_resamples": 400,
+    "unique_values_mbps": [
+      81.0,
+      100.0,
+      140.0,
+      143.0,
+      149.0,
+      150.0,
+      153.0,
+      170.0,
+      199.0,
+      200.0,
+      204.0,
+      220.0,
+      249.0,
+      286.0,
+      299.0,
+      300.0,
+      306.0
+    ]
+  },
+  "budget_sensitivity_mbps": {
+    "0.0": {
+      "100.0": 0.0,
+      "150.0": 0.0,
+      "200.0": 0.0,
+      "300.0": 0.0,
+      "500.0": 0.0
+    },
+    "1.0": {
+      "100.0": 81.0,
+      "150.0": 81.0,
+      "200.0": 81.0,
+      "300.0": 81.0,
+      "500.0": 81.0
+    },
+    "5.0": {
+      "100.0": 153.0,
+      "150.0": 153.0,
+      "200.0": 153.0,
+      "300.0": 153.0,
+      "500.0": 153.0
+    },
+    "10.0": {
+      "100.0": 220.0,
+      "150.0": 220.0,
+      "200.0": 220.0,
+      "300.0": 220.0,
+      "500.0": 306.0
+    },
+    "20.0": {
+      "100.0": 220.0,
+      "150.0": 220.0,
+      "200.0": 220.0,
+      "300.0": 220.0,
+      "500.0": 306.0
+    }
+  }
+}
