@@ -4,36 +4,36 @@
     "layer": "layer1",
     "target": "throughput_gbps",
     "model_variant": "full",
-    "mae": 0.003259253926936472,
-    "rmse": 0.05020424606389223,
-    "r2": 0.9987679521575059
+    "mae": 0.0022774779626065773,
+    "rmse": 0.008946142316173052,
+    "r2": 0.999958014202734
   },
   {
     "variant": "dpdk",
     "layer": "layer1",
     "target": "throughput_gbps",
     "model_variant": "lite",
-    "mae": 0.0024867078491293522,
-    "rmse": 0.05221866010104608,
-    "r2": 0.9986670983016045
+    "mae": 0.00045932458494325545,
+    "rmse": 0.0005498386034770803,
+    "r2": 0.9999998414007042
   },
   {
     "variant": "dpdk",
     "layer": "layer1",
     "target": "cpu_pct",
     "model_variant": "full",
-    "mae": 0.0030421207539486693,
-    "rmse": 0.0038347272659507306,
-    "r2": 0.01506766986851693
+    "mae": 0.0029334009460501103,
+    "rmse": 0.003710424981173559,
+    "r2": 0.010835801979683257
   },
   {
     "variant": "dpdk",
     "layer": "layer1",
     "target": "cpu_pct",
     "model_variant": "lite",
-    "mae": 0.00306360456897014,
-    "rmse": 0.0038701458348135466,
-    "r2": -0.0032105513675912967
+    "mae": 0.0029451954377185314,
+    "rmse": 0.003729773868649775,
+    "r2": 0.0004924424617273049
   },
   {
     "variant": "dpdk",
@@ -58,215 +58,215 @@
     "layer": "layer1",
     "target": "downlink_one_way_delay_distribution__weighted_mean_delay_us",
     "model_variant": "full",
-    "mae": 279.44551762041766,
-    "rmse": 1520.3129204665677,
-    "r2": 0.6158346118160463
+    "mae": 348.8717676087681,
+    "rmse": 690.0163355410235,
+    "r2": 0.277071946033529
   },
   {
     "variant": "dpdk",
     "layer": "layer1",
     "target": "downlink_one_way_delay_distribution__weighted_mean_delay_us",
     "model_variant": "lite",
-    "mae": 376.2868673575061,
-    "rmse": 2026.1936980326898,
-    "r2": 0.3176390239262433
+    "mae": 321.47207809771254,
+    "rmse": 674.5987196758235,
+    "r2": 0.309017006370111
   },
   {
     "variant": "dpdk",
     "layer": "layer2",
     "target": "power_watts",
     "model_variant": "full",
-    "mae": 0.003107661056350067,
-    "rmse": 0.003944512165666067,
-    "r2": 0.2863731433201415
+    "mae": 0.0032988574053425283,
+    "rmse": 0.004035072219440649,
+    "r2": 0.24088173758845044
   },
   {
     "variant": "dpdk",
     "layer": "layer2",
     "target": "power_watts",
     "model_variant": "lite",
-    "mae": 0.0031122972287046225,
-    "rmse": 0.003962417974849059,
-    "r2": 0.2798795297579778
+    "mae": 0.0033451551305816976,
+    "rmse": 0.0040863638897606,
+    "r2": 0.22146007121145628
   },
   {
     "variant": "usr_full",
     "layer": "layer1",
     "target": "throughput_gbps",
     "model_variant": "full",
-    "mae": 0.00996518143726197,
-    "rmse": 0.03318492187194342,
-    "r2": 0.9983913625231289
+    "mae": 0.010044458088152972,
+    "rmse": 0.02757523722896531,
+    "r2": 0.9988909545498643
   },
   {
     "variant": "usr_full",
     "layer": "layer1",
     "target": "throughput_gbps",
     "model_variant": "lite",
-    "mae": 0.017537294786531585,
-    "rmse": 0.0513258926541436,
-    "r2": 0.9961518711453868
+    "mae": 0.015400040436236048,
+    "rmse": 0.039459618889514415,
+    "r2": 0.9977290027799269
   },
   {
     "variant": "usr_full",
     "layer": "layer1",
     "target": "cpu_pct",
     "model_variant": "full",
-    "mae": 0.04253192107355517,
-    "rmse": 0.14628798278812644,
-    "r2": 0.9913290586621114
+    "mae": 0.040935796448863436,
+    "rmse": 0.11918035127181496,
+    "r2": 0.9933907557511834
   },
   {
     "variant": "usr_full",
     "layer": "layer1",
     "target": "cpu_pct",
     "model_variant": "lite",
-    "mae": 0.08403726624877425,
-    "rmse": 0.2765710651638745,
-    "r2": 0.969007084654211
+    "mae": 0.05519509739921412,
+    "rmse": 0.16357467617921517,
+    "r2": 0.9875498490220659
   },
   {
     "variant": "usr_full",
     "layer": "layer1",
     "target": "gtpu_packets_dn__packets_lost_delta",
     "model_variant": "full",
-    "mae": 3090.893621762881,
-    "rmse": 8911.10511080497,
-    "r2": 0.9984319365665746
+    "mae": 2771.1782426447858,
+    "rmse": 8728.004642544398,
+    "r2": 0.9977320969967988
   },
   {
     "variant": "usr_full",
     "layer": "layer1",
     "target": "gtpu_packets_dn__packets_lost_delta",
     "model_variant": "lite",
-    "mae": 4336.744008415378,
-    "rmse": 13733.396083459538,
-    "r2": 0.9962755994174284
+    "mae": 3845.8729121847327,
+    "rmse": 12821.095709800575,
+    "r2": 0.9951062156995668
   },
   {
     "variant": "usr_full",
     "layer": "layer1",
     "target": "downlink_one_way_delay_distribution__weighted_mean_delay_us",
     "model_variant": "full",
-    "mae": 731.7181072514832,
-    "rmse": 1597.8225848170619,
-    "r2": 0.9677671888020424
+    "mae": 670.7275542561918,
+    "rmse": 1712.492328693633,
+    "r2": 0.96416223294428
   },
   {
     "variant": "usr_full",
     "layer": "layer1",
     "target": "downlink_one_way_delay_distribution__weighted_mean_delay_us",
     "model_variant": "lite",
-    "mae": 974.857394215642,
-    "rmse": 2119.4796955032116,
-    "r2": 0.943284783516504
+    "mae": 701.6165669593465,
+    "rmse": 1766.0938213136196,
+    "r2": 0.9618836579876732
   },
   {
     "variant": "usr_full",
     "layer": "layer2",
     "target": "power_watts",
     "model_variant": "full",
-    "mae": 0.0485102975228032,
-    "rmse": 0.16862195854500192,
-    "r2": 0.9883534611312507
+    "mae": 0.0451316646026326,
+    "rmse": 0.1263010191813426,
+    "r2": 0.9925890425479009
   },
   {
     "variant": "usr_full",
     "layer": "layer2",
     "target": "power_watts",
     "model_variant": "lite",
-    "mae": 0.08801782896706406,
-    "rmse": 0.29518125247982296,
-    "r2": 0.964310031545585
+    "mae": 0.05635363626713844,
+    "rmse": 0.1649717394710334,
+    "r2": 0.9873561388770106
   },
   {
     "variant": "usr_safe",
     "layer": "layer1",
     "target": "throughput_gbps",
     "model_variant": "full",
-    "mae": 3.2899844641147515e-05,
-    "rmse": 0.0001276598086002468,
-    "r2": 0.999998283980484
+    "mae": 3.153616336586882e-05,
+    "rmse": 0.00015044488018726892,
+    "r2": 0.9999925523311777
   },
   {
     "variant": "usr_safe",
     "layer": "layer1",
     "target": "throughput_gbps",
     "model_variant": "lite",
-    "mae": 1.2361368353333752e-05,
-    "rmse": 8.163414629323561e-05,
-    "r2": 0.999999298290178
+    "mae": 8.02895884098644e-06,
+    "rmse": 7.541186873522112e-05,
+    "r2": 0.9999981286934542
   },
   {
     "variant": "usr_safe",
     "layer": "layer1",
     "target": "cpu_pct",
     "model_variant": "full",
-    "mae": 0.01290789561504693,
-    "rmse": 0.028127969720143652,
-    "r2": 0.9991532092158347
+    "mae": 0.015952402365673912,
+    "rmse": 0.03989267519437854,
+    "r2": 0.996719607685277
   },
   {
     "variant": "usr_safe",
     "layer": "layer1",
     "target": "cpu_pct",
     "model_variant": "lite",
-    "mae": 0.019732920185534172,
-    "rmse": 0.05706991262091329,
-    "r2": 0.9965141092951444
+    "mae": 0.022989087234526404,
+    "rmse": 0.09437058821171032,
+    "r2": 0.9816425316622676
   },
   {
     "variant": "usr_safe",
     "layer": "layer1",
     "target": "gtpu_packets_dn__packets_lost_delta",
     "model_variant": "full",
-    "mae": 0.4595073871959177,
-    "rmse": 3.341602012035915,
-    "r2": 0.8418407314158185
+    "mae": 0.18531014209074156,
+    "rmse": 1.2584059528631681,
+    "r2": 0.3323367878777541
   },
   {
     "variant": "usr_safe",
     "layer": "layer1",
     "target": "gtpu_packets_dn__packets_lost_delta",
     "model_variant": "lite",
-    "mae": 1.2737735178146188,
-    "rmse": 8.319951729553438,
-    "r2": 0.01954692344241904
+    "mae": 0.5846204103173814,
+    "rmse": 1.5783701136071868,
+    "r2": -0.05034897837854069
   },
   {
     "variant": "usr_safe",
     "layer": "layer1",
     "target": "downlink_one_way_delay_distribution__weighted_mean_delay_us",
     "model_variant": "full",
-    "mae": 13.412605175218681,
-    "rmse": 37.94787173009179,
-    "r2": 0.5172895009358209
+    "mae": 7.319421924152691,
+    "rmse": 28.6651794200443,
+    "r2": 0.588185343585928
   },
   {
     "variant": "usr_safe",
     "layer": "layer1",
     "target": "downlink_one_way_delay_distribution__weighted_mean_delay_us",
     "model_variant": "lite",
-    "mae": 13.073774622638705,
-    "rmse": 37.59181529690604,
-    "r2": 0.5263053351084795
+    "mae": 7.124710168347078,
+    "rmse": 28.463069187790172,
+    "r2": 0.5939720530927088
   },
   {
     "variant": "usr_safe",
     "layer": "layer2",
     "target": "power_watts",
     "model_variant": "full",
-    "mae": 0.012123948555084295,
-    "rmse": 0.025776851769571778,
-    "r2": 0.9990088492177535
+    "mae": 0.014790305068803734,
+    "rmse": 0.031626424074355806,
+    "r2": 0.995999975942311
   },
   {
     "variant": "usr_safe",
     "layer": "layer2",
     "target": "power_watts",
     "model_variant": "lite",
-    "mae": 0.014625384134791553,
-    "rmse": 0.04346789033122903,
-    "r2": 0.9971815060615141
+    "mae": 0.01897042732156183,
+    "rmse": 0.07563891061487224,
+    "r2": 0.9771201615366323
   }
 ]
